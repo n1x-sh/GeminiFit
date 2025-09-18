@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import type { WorkoutPlan, WorkoutHistory, UserProfile, NutritionHistory, ChatMessage, DailyFoodLog, FoodItem, PR } from '../types';
 import { generateWorkoutPlan as callGeminiApi, getNutritionInfo, getNutritionInfoFromImage } from '../services/geminiService';
@@ -50,21 +51,6 @@ export const useAppLogic = () => {
       setIsInitializing(false);
     }
   }, []);
-
-  // Effect for initializing the chat instance whenever the user profile is available
-  useEffect(() => {
-    if (userProfile) {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
-        chatInstance.current = ai.chats.create({
-            model: 'gemini-2.5-flash',
-            config: {
-                systemInstruction: `You are a friendly and encouraging AI fitness and nutrition coach named Gemini Fit. The user's name is ${userProfile.name} and their fitness profile is: Level: ${userProfile.level}, Goal: ${userProfile.goal}. Keep your answers concise, helpful, and positive.`,
-            },
-        });
-    } else {
-        chatInstance.current = null;
-    }
-  }, [userProfile]);
 
 
   const login = useCallback((profile: UserProfile) => {
@@ -181,11 +167,30 @@ export const useAppLogic = () => {
   }, []);
 
   const sendMessageToCoach = useCallback(async (message: string, onStream: (chunk: string) => void) => {
+    // Lazily initialize the chat instance on first message
     if (!chatInstance.current) {
-        setError("Chat not initialized. Please refresh the page.");
-        console.error("Chat not initialized");
-        return;
+        if (!userProfile) {
+            setError("Cannot start chat. User profile is not available.");
+            console.error("User profile is missing, cannot initialize chat.");
+            return;
+        }
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+            chatInstance.current = ai.chats.create({
+                model: 'gemini-2.5-flash',
+                history: chatHistory,
+                config: {
+                    systemInstruction: `You are a friendly and encouraging AI fitness and nutrition coach named Gemini Fit. The user's name is ${userProfile.name} and their fitness profile is: Level: ${userProfile.level}, Goal: ${userProfile.goal}. Keep your answers concise, helpful, and positive.`,
+                },
+            });
+        } catch (e) {
+            console.error("Error initializing chat instance:", e);
+            const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+            setError(`Failed to initialize AI Coach. ${errorMessage}`);
+            return;
+        }
     }
+
     const userMessage: ChatMessage = { role: 'user', parts: [{ text: message }] };
     setChatHistory(prev => [...prev, userMessage]);
 
@@ -199,16 +204,18 @@ export const useAppLogic = () => {
         }
         
         const modelMessage: ChatMessage = { role: 'model', parts: [{ text: fullResponse }] };
-        const newHistory = [...chatHistory, userMessage, modelMessage];
-        setChatHistory(newHistory);
-        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(newHistory));
+        setChatHistory(prev => {
+            const newHistory = [...prev, modelMessage];
+            localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(newHistory));
+            return newHistory;
+        });
         
     } catch (e) {
         console.error("Error sending message:", e);
         const errorMessage: ChatMessage = { role: 'model', parts: [{ text: "Sorry, I encountered an error. Please try again." }] };
         setChatHistory(prev => [...prev, errorMessage]);
     }
-  }, [chatHistory]);
+  }, [chatHistory, userProfile]);
 
   const addPR = useCallback((pr: Omit<PR, 'id' | 'date'>) => {
     const newPR: PR = {

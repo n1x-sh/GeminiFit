@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Workout Planner",
+  "description": "A mobile-first web app that acts as a workout planner and tracker, using Gemini to generate personalized fitness plans.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

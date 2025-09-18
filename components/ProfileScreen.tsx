@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import type { UserProfile, WorkoutHistory, PR } from '../types';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Icon } from './Icon';
+import SimpleBarChart from './SimpleBarChart';
 
 interface ProfileScreenProps {
   profile: UserProfile;
@@ -70,18 +70,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ profile, workoutHistory, 
 
       <h3 className="text-xl font-bold text-text-primary mb-4">Activity This Week</h3>
       <div className="bg-surface rounded-lg p-4 h-64 w-full mb-8">
-         <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklyData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#4A4A4A" />
-                <XAxis dataKey="name" stroke="#B3B3B3" />
-                <YAxis allowDecimals={false} stroke="#B3B3B3" />
-                <Tooltip 
-                    contentStyle={{ backgroundColor: '#121212', border: '1px solid #4A4A4A' }}
-                    labelStyle={{ color: '#FFFFFF' }}
-                />
-                <Bar dataKey="exercises" fill="#00F5D4" name="Completed Exercises" />
-            </BarChart>
-        </ResponsiveContainer>
+         <SimpleBarChart data={weeklyData} />
       </div>
       
       <PRSection personalRecords={personalRecords} addPR={addPR} />

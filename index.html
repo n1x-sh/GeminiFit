@@ -5,23 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gemini Workout Planner</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'primary': '#00F5D4',
-              'secondary': '#00B9A2',
-              'background': '#121212',
-              'surface': '#1E1E1E',
-              'text-primary': '#FFFFFF',
-              'text-secondary': '#B3B3B3',
-            },
-          },
-        },
-      }
-    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <script type="importmap">
 {
   "imports": {
@@ -54,6 +38,28 @@
   .fade-in {
     animation: fadeIn 0.3s ease-out forwards;
   }
+</style>
+<style>
+  /* Custom theme styles to replace tailwind.config.js */
+  .bg-primary { background-color: #00F5D4; }
+  .text-primary { color: #00F5D4; }
+  .border-primary { border-color: #00F5D4; }
+  .focus\:border-primary:focus { border-color: #00F5D4; }
+  .focus\:ring-primary:focus { --tw-ring-color: #00F5D4; }
+
+  .bg-secondary { background-color: #00B9A2; }
+  .hover\:bg-secondary:hover { background-color: #00B9A2; }
+  .text-secondary { color: #00B9A2; }
+
+  .bg-background { background-color: #121212; }
+  .text-background { color: #121212; }
+
+  .bg-surface { background-color: #1E1E1E; }
+
+  .text-text-primary { color: #FFFFFF; }
+  .hover\:text-text-primary:hover { color: #FFFFFF; }
+  
+  .text-text-secondary { color: #B3B3B3; }
 </style>
 </head>
   <body class="bg-background">

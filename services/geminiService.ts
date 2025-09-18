@@ -1,8 +1,7 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import type { UserProfile, WorkoutPlan, Exercise, DailyWorkout, FoodItem } from '../types';
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
 const workoutResponseSchema = {
   type: Type.OBJECT,
@@ -71,6 +70,7 @@ export const generateWorkoutPlan = async (profile: UserProfile): Promise<Workout
   `;
 
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -109,6 +109,7 @@ export const getNutritionInfo = async (query: string): Promise<FoodItem[]> => {
     `;
 
     try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt,
@@ -138,6 +139,7 @@ export const getNutritionInfoFromImage = async (base64Image: string): Promise<Fo
     };
 
     try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: { parts: [imagePart, textPart] },
